@@ -3,9 +3,10 @@ import { useAccount, useBalance, useChainId } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 import SendTokenForm from './SendTokenForm'
+import SignMessage from './SignMessage'
 
 function App() {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const { data: balanceData } = useBalance({ address })
 
@@ -30,6 +31,8 @@ function App() {
       </div>
 
       <SendTokenForm />
+
+      {isConnected && <SignMessage />}
     </div>
   )
 }
