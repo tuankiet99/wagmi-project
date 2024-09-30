@@ -4,6 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 import SendTokenForm from './SendTokenForm'
 import SignMessage from './SignMessage'
+import SendTokenFormSpace3 from './space3-sdk/SendTokenForm'
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -31,8 +32,13 @@ function App() {
       </div>
 
       <SendTokenForm />
+      <br />
+
+      <SendTokenFormSpace3 />
+      <br />
 
       {isConnected && <SignMessage />}
+      <br />
     </div>
   )
 }

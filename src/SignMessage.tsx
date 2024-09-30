@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect, useState } from 'react'
+import { MouseEvent, useState } from 'react'
 import { recoverMessageAddress } from 'viem'
 import { useSignMessage } from 'wagmi'
 
@@ -10,28 +10,26 @@ function SignMessage() {
     error,
     isPending,
     signMessage,
-    variables,
   } = useSignMessage()
+  const [signature, setSignature] = useState('')
 
   const handleSubmit = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     signMessage({ message })
   }
 
-  useEffect(() => {
-    ;(async () => {
-      if (variables?.message && signMessageData) {
-        const recoveredAddress = await recoverMessageAddress({
-          message: variables?.message,
-          signature: signMessageData,
-        })
-        setRecoveredAddress(recoveredAddress)
-      }
-    })()
-  }, [signMessageData, variables?.message])
+  const handleRecoverAddress = async () => {
+    if (message && signature) {
+      const recoveredAddress = await recoverMessageAddress({
+        message,
+        signature: signature as any,
+      })
+      setRecoveredAddress(recoveredAddress)
+    }
+  }
 
   return (
-    <div style={{ maxWidth: '500px' }}>
+    <div style={{ maxWidth: '600px' }}>
       <h1 className="title">Sign Message</h1>
 
       <form>
@@ -51,15 +49,27 @@ function SignMessage() {
       {signMessageData && (
         <div style={{ whiteSpace: 'initial' }}>
           <div>
-            <strong>Recovered Address:</strong> {recoveredAddress}
-          </div>
-          <hr />
-          <div>
             <strong>Signature:</strong>
             <p style={{ wordWrap: 'break-word', margin: 0 }}>
               {signMessageData}
             </p>
           </div>
+          <hr />
+          <label htmlFor="signature">
+            Enter the signature to recover address
+          </label>
+          <textarea
+            id="signature"
+            style={{ width: 500, height: 100 }}
+            placeholder="Please enter the signature"
+            onChange={(e) => setSignature(e.target.value)}
+          />
+          <button onClick={handleRecoverAddress}>Recover Address</button>
+          {recoveredAddress && (
+            <div>
+              <strong>Recovered Address:</strong> {recoveredAddress}
+            </div>
+          )}
         </div>
       )}
       {error && <div>{error.message}</div>}

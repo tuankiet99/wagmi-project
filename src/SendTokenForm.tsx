@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import {
   useAccount,
-  useChainId,
   useConnect,
   useReadContract,
   useWriteContract,
 } from 'wagmi'
 import { sepolia } from 'viem/chains'
 import { injected } from 'wagmi/connectors'
-import { erc20Abi } from 'viem'
+import { erc20Abi, formatUnits } from 'viem'
 
 function SendTokenForm() {
   const { address } = useAccount()
@@ -23,23 +22,24 @@ function SendTokenForm() {
   const [txHash, setTxHash] = useState('')
   const [completed, setCompleted] = useState(false)
 
-  //NOTE: có thể do contract ko có method balanceOf nên không thể lấy ra được balanceOf
   const { data: contractBalance } = useReadContract({
-    address: address as any,
-    abi: [
-      {
-        inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ],
+    address: tokenAddress as any,
+    abi: erc20Abi,
     functionName: 'balanceOf',
-    args: [tokenAddress as any],
+    args: [address as any],
   })
 
-  console.log({ contractBalance })
+  const { data: contractDecimals } = useReadContract({
+    address: tokenAddress as any,
+    abi: erc20Abi,
+    functionName: 'decimals',
+  })
+
+  const { data: contractSymbol } = useReadContract({
+    address: tokenAddress as any,
+    abi: erc20Abi,
+    functionName: 'symbol',
+  })
 
   const handleSubmit = async () => {
     try {
@@ -82,20 +82,27 @@ function SendTokenForm() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          gap: 10,
         }}
       >
         <input
           type="text"
           placeholder="Token address"
+          style={{ width: 400 }}
           value={tokenAddress}
           onChange={(e) => setTokenAddress(e.target.value)}
         />
-        <h4>Contract balance: {contractBalance?.toString()}</h4>
+        <h4>
+          Contract balance:{' '}
+          {formatUnits(contractBalance ?? 0n, contractDecimals ?? 0)}{' '}
+          {contractSymbol}
+        </h4>
       </div>
 
       <input
         type="text"
         placeholder="Target wallet"
+        style={{ width: 400 }}
         value={targetWallet}
         onChange={(e) => setTargetWallet(e.target.value)}
       />
