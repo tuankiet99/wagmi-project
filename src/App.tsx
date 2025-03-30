@@ -2,9 +2,10 @@ import { useMemo } from 'react'
 import { useAccount, useBalance, useChainId } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
-import SendTokenForm from './SendTokenForm'
-import SignMessage from './SignMessage'
+import SendTokenForm from './views/SendTokenForm'
+import SignMessage from './views/SignMessage'
 import SendTokenFormSpace3 from './space3-sdk/SendTokenForm'
+import Multicall from './views/multicall'
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -38,6 +39,9 @@ function App() {
       <br />
 
       {isConnected && <SignMessage />}
+      <br />
+
+      <Multicall />
       <br />
     </div>
   )
